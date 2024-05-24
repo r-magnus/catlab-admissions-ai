@@ -1,6 +1,12 @@
 # Predictive regression model for CATlab's admissions project
 # @author Ryan Magnuson rmagnuson@westmont.edu
 
+# Warning Suppression # TODO: Uncomment the below code to suppress warnings from scikit!
+# def warn(*args, **kwargs): # @Override
+#     pass # suppression
+# import warnings
+# warnings.warn = warn
+
 # Setup
 import matplotlib.pyplot as plt
 import pandas as pd
