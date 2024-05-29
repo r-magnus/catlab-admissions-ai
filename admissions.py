@@ -46,7 +46,13 @@ for column in students.columns: # NOTE: add in skipping id entries (or drop them
 # Convert cat to num
 from sklearn.preprocessing import LabelEncoder
 le = LabelEncoder()
-# WIP
+for cat in cat_vars:
+  students[cat] = le.fit_transform(students[cat])
+
+# Add cat back to num
+print()
+for cat in cat_vars:
+  num_vars.append(cat)
 
 # Missing Data Plot
 plt.figure(figsize=(10,6))
@@ -61,12 +67,19 @@ plt.savefig("null_entries.jpg")
 plt.close()
 #sns.set(font_scale=1) # reset, just in case
 
-# Correlation Matrix (numerical)
-sns.set(font_scale=.6) # .6
-corrMatrix = train[num_vars].corr()
-sns.heatmap(corrMatrix, annot=True)
-plt.savefig("correlation_matrix.png")
-plt.close()
+# Correlation Matrix (numerical) # TODO: Make Categorical vars work first!
+# sns.set(font_scale=.6) # .6
+# corrMatrix = train[students.columns].corr() # num_vars
+# sns.heatmap(corrMatrix, annot=True)
+# plt.savefig("correlation_matrix.png")
+# plt.close()
 
-# MICE DATA IMPUTATION #
-# from miceforest import ImputationKernel # ask Mike!
+# DATA IMPUTATION #
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+
+imputer = IterativeImputer(n_nearest_features=None, imputation_order='ascending') # estimator=BayesianRidge()
+imputer.fit(students)
+students_imputed = imputer.transform(students)
+students_imputed = pd.DataFrame(students_imputed)
+students_imputed.to_csv("imputed.csv", sep=",") # this will probably not give accurate results... but who knows?
