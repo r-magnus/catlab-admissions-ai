@@ -43,16 +43,16 @@ for column in students.columns: # NOTE: add in skipping id entries (or drop them
 # print("CAT VARS: \n%s\nLen: %d" % (cat_vars, len(cat_vars)))
 # print("NUM VARS: \n%s\nLen: %d" % (num_vars, len(num_vars)))
 
-# Convert cat to num
-from sklearn.preprocessing import LabelEncoder
-le = LabelEncoder()
-for cat in cat_vars:
-  students[cat] = le.fit_transform(students[cat])
-
-# Add cat back to num
-print()
-for cat in cat_vars:
-  num_vars.append(cat)
+# # Convert cat to num
+# from sklearn.preprocessing import LabelEncoder
+# le = LabelEncoder()
+# for cat in cat_vars:
+#   students[cat] = le.fit_transform(students[cat])
+#
+# # Add cat back to num
+# print()
+# for cat in cat_vars:
+#   num_vars.append(cat)
 
 # Missing Data Plot
 plt.figure(figsize=(10,6))
@@ -67,6 +67,19 @@ plt.savefig("null_entries.jpg")
 plt.close()
 #sns.set(font_scale=1) # reset, just in case
 
+# SCATTER PLOTS #
+for y in num_vars:
+  print(y)
+  for x in num_vars:
+    plt.figure(figsize=(10,10))
+    sns.set(font_scale=.8)
+    sns.scatterplot(
+      x=students[x],
+      y=students[y]
+    )
+    plt.savefig("scatters/%s_%s.jpg" % (str(x).replace("Active Application: ", ""), str(y).replace("Active Application: ", "")))
+    plt.close()
+
 # Correlation Matrix (numerical) # TODO: Make Categorical vars work first!
 # sns.set(font_scale=.6) # .6
 # corrMatrix = train[students.columns].corr() # num_vars
@@ -75,11 +88,11 @@ plt.close()
 # plt.close()
 
 # DATA IMPUTATION #
-from sklearn.experimental import enable_iterative_imputer
-from sklearn.impute import IterativeImputer
-
-imputer = IterativeImputer(n_nearest_features=None, imputation_order='ascending') # estimator=BayesianRidge()
-imputer.fit(students)
-students_imputed = imputer.transform(students)
-students_imputed = pd.DataFrame(students_imputed)
-students_imputed.to_csv("imputed.csv", sep=",") # this will probably not give accurate results... but who knows?
+# from sklearn.experimental import enable_iterative_imputer
+# from sklearn.impute import IterativeImputer
+#
+# imputer = IterativeImputer(n_nearest_features=None, imputation_order='ascending') # estimator=BayesianRidge()
+# imputer.fit(students)
+# students_imputed = imputer.transform(students)
+# students_imputed = pd.DataFrame(students_imputed)
+# students_imputed.to_csv("imputed.csv", sep=",") # this will probably not give accurate results... but who knows?
