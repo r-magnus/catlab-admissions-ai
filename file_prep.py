@@ -154,17 +154,20 @@ def parse_dates(date_column):
 
 # TODO: use parsing method to calc age and whatnot
 
-# Displaying Missing Data (updated)
-plt.figure(figsize=(10,6)) # TODO: Uncomment to generate new graph
-sns.set(font_scale=.45)
-sns.displot(
-  data=students.isna().melt(value_name="missing"),
-  y="variable",
-  hue="missing",
-  multiple="fill"
-)
-plt.savefig("updated_null_entries.jpg")
-plt.close()
+# # Displaying Missing Data (updated)
+# plt.figure(figsize=(10,6)) # TODO: Uncomment to generate new graph
+# sns.set(font_scale=.45)
+# sns.displot(
+#   data=students.isna().melt(value_name="missing"),
+#   y="variable",
+#   hue="missing",
+#   multiple="fill"
+# )
+# plt.savefig("updated_null_entries.jpg")
+# plt.close()
+
+# Save CSV
+students.to_csv("updated_admissions_data.csv") # TODO: Uncomment to save .csv file
 
 # NOTES:
 """
@@ -172,4 +175,5 @@ plt.close()
 - calculate age, once assured it is accurate
 - wait for Mike for a few remaining columns
 - Currently using LabelEncoder to cover null data, see if that should be changed
+- still some special case vars to check, look at updated .csv
 """
