@@ -95,7 +95,7 @@ def combine_num(A_col, B_col):
     else:
       combined.append(students.loc[i, A_col]) # currently ignores if B_col also has mismatching val (average)
 
-  students["Combined %s + %s" % (A_col, B_col)] = combined
+  students["Combined %s + %s" % (A_col, B_col)] = combined # new column
 
 combine_num("GPA", "GPA Academic")
 students = students.drop("GPA", axis=1)
@@ -105,7 +105,8 @@ students = students.drop("GPA Academic", axis=1)
 # print(students.head()) # debug sout
 
 # Encoding Major of Interest
-# TODO: Do this manually
+to_encode = ["Active Application: Major of Interest", "Active Application: Major of Interest 2"]
+label_encode(to_encode) # NOTE: Currently ignoring null data and just throwing it into encoding.
 
 # Separate Categorical vars
 cat_vars = []
@@ -136,6 +137,9 @@ date_vars = separate_date_vars(cat_vars)
 # print(cat_vars) # debug sout
 # print(date_vars) # debug sout
 
+# Mass Encoding
+label_encode(cat_vars) # NOTE: Currently ignoring null data and just throwing it into encoding.
+
 # Calculate Age
 def parse_dates(date_column):
   """
@@ -150,18 +154,22 @@ def parse_dates(date_column):
 
 # TODO: use parsing method to calc age and whatnot
 
-# Dropping Similar Cols
-# TODO: Figure out what can be dropped safely
-
 # Displaying Missing Data (updated)
-# plt.figure(figsize=(10,6)) # TODO: Uncomment to generate new graph
-# sns.set(font_scale=.45)
-# sns.displot(
-#   data=students.isna().melt(value_name="missing"),
-#   y="variable",
-#   hue="missing",
-#   multiple="fill"
-# )
-# plt.savefig("updated_null_entries.jpg")
-# plt.close()
-# sns.set(font_scale=1) # reset
+plt.figure(figsize=(10,6)) # TODO: Uncomment to generate new graph
+sns.set(font_scale=.45)
+sns.displot(
+  data=students.isna().melt(value_name="missing"),
+  y="variable",
+  hue="missing",
+  multiple="fill"
+)
+plt.savefig("updated_null_entries.jpg")
+plt.close()
+
+# NOTES:
+"""
+- May drop 'To Date:' column
+- calculate age, once assured it is accurate
+- wait for Mike for a few remaining columns
+- Currently using LabelEncoder to cover null data, see if that should be changed
+"""
