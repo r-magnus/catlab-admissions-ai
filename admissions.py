@@ -25,7 +25,7 @@ removable = ["Contact Case Safe ID [TRUNCATED]", "Active Application: Case Safe 
              "Case Safe ID_y [TRUNCATED]", "Case Safe ID.1 [TRUNCATED]",
              "Financial Aid Package ID [TRUNCATED]", "Application Case Safe Id [TRUNCATED]",
              "Colleague_Id [TRUNCATED]", "External Package Id [TRUNCATED]"]
-for to_remove in removable:
+for to_remove in removable: # ID removal
   students = students.drop(to_remove, axis=1)
 print(students.head(), students.shape)
 
@@ -43,42 +43,37 @@ for column in students.columns: # NOTE: add in skipping id entries (or drop them
 # print("CAT VARS: \n%s\nLen: %d" % (cat_vars, len(cat_vars)))
 # print("NUM VARS: \n%s\nLen: %d" % (num_vars, len(num_vars)))
 
-# # Convert cat to num
-# from sklearn.preprocessing import LabelEncoder
-# le = LabelEncoder()
-# for cat in cat_vars:
-#   students[cat] = le.fit_transform(students[cat])
-#
-# # Add cat back to num
-# print()
-# for cat in cat_vars:
-#   num_vars.append(cat)
+# Data Conversion & Transformation
+from sklearn.preprocessing import LabelBinarizer # not quite what we want here
+lb = LabelBinarizer()
+
+students.drop("_Short8374", axis=1)
 
 # Missing Data Plot
-plt.figure(figsize=(10,6))
-sns.set(font_scale=.45)
-sns.displot(
-  data=students.isna().melt(value_name="missing"),
-  y="variable",
-  hue="missing",
-  multiple="fill"
-)
-plt.savefig("null_entries.jpg")
-plt.close()
+# plt.figure(figsize=(10,6))
+# sns.set(font_scale=.45)
+# sns.displot(
+#   data=students.isna().melt(value_name="missing"),
+#   y="variable",
+#   hue="missing",
+#   multiple="fill"
+# )
+# plt.savefig("null_entries.jpg")
+# plt.close()
 #sns.set(font_scale=1) # reset, just in case
 
 # SCATTER PLOTS #
-for y in num_vars:
-  print(y)
-  for x in num_vars:
-    plt.figure(figsize=(10,10))
-    sns.set(font_scale=.8)
-    sns.scatterplot(
-      x=students[x],
-      y=students[y]
-    )
-    plt.savefig("scatters/%s_%s.jpg" % (str(x).replace("Active Application: ", ""), str(y).replace("Active Application: ", "")))
-    plt.close()
+# for y in num_vars: # TODO: Uncomment this section to regenerate scatter plots!
+#   print(y)
+#   for x in num_vars:
+#     plt.figure(figsize=(10,10))
+#     sns.set(font_scale=.8)
+#     sns.scatterplot(
+#       x=students[x],
+#       y=students[y]
+#     )
+#     plt.savefig("scatters/%s_%s.jpg" % (str(x).replace("Active Application: ", ""), str(y).replace("Active Application: ", "")))
+#     plt.close()
 
 # Correlation Matrix (numerical) # TODO: Make Categorical vars work first!
 # sns.set(font_scale=.6) # .6
