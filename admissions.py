@@ -1,6 +1,8 @@
 # Predictive regression model for CATlab's admissions project
 # @author Ryan Magnuson rmagnuson@westmont.edu
 
+## NOTE: Currently Deprecated. ##
+
 # Warning Suppression # TODO: Uncomment the below code to suppress warnings from scikit!
 # def warn(*args, **kwargs): # @Override
 #     pass # suppression
