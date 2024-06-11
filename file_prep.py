@@ -71,8 +71,10 @@ def fill_in(to_fill):
         students.loc[row, fillable] = 0
 
 to_fill_in = ["Augustinian Fit", "Augustinian Leadership",
-              "Cum GPA", "Number of Visits", "Active Application: Max SAT Composite"
-              ] # NOTE: may need to remove some of these -- assumptions
+              "Number of Visits", "Active Application: Max SAT Composite",
+              "Unmet Need", "Family Contribution", "Award to Total Aid Validation", # NOTE: may need to remove some of these -- assumptions
+              "Pell Grant Eligible", "Total Funds", "Total Aid"
+              ]
 fill_in(to_fill_in)
 
 # print(students["Augustinian Fit"]) # debug sout
@@ -100,6 +102,12 @@ def combine_num(A_col, B_col):
 combine_num("GPA", "GPA Academic")
 students = students.drop("GPA", axis=1)
 students = students.drop("GPA Academic", axis=1)
+
+combine_num("Combined GPA + GPA Academic", "Cum GPA") # Instead of keeping separate
+students = students.drop("Cum GPA", axis=1)
+students = students.drop("Combined GPA + GPA Academic", axis=1) # messy
+
+# fill_in("Combined Combined GPA + GPA Academic + Cum GPA")
 
 # print(students["Combined GPA + GPA Academic"]) # debug sout
 # print(students.head()) # debug sout
@@ -140,40 +148,86 @@ date_vars = separate_date_vars(cat_vars)
 # Mass Encoding
 label_encode(cat_vars) # NOTE: Currently ignoring null data and just throwing it into encoding.
 
+# Manual Column Removal
+to_drop = ["To Date:", "Active Application: Date Prospect"] # NOTE: may need to restore, currently operating under a big assumption
+for droppable in to_drop:
+  date_vars.remove(droppable)
+  students = students.drop(droppable, axis=1)
+
 # Calculate Age
-def parse_dates(date_column):
+def parse_dates(date_columns):
   """
   Turns all dates (str) into list of ints, from given column name
-  :param date_column: individual column with date-based data
-  :return: List of lists with the format [month,day,year]
+  :param date_columns: individual column with date-based data
+  :return: List of lists with the format [[month, day, year], ...]
   """
   dates = []
-  for date in students[date_column]:
+  for date in date_columns:
     dates.append(date.split("/"))
   return dates
 
-# TODO: use parsing method to calc age and whatnot
+def calculate_age(start_date_col, end_date_col):
+  """
+  Calculates age based on given column names, assuming date data type, split with '/' character.
+  Recommended to drop given columns once called.
+  :param start_date_col: Name of beginning column
+  :param end_date_col: Name of ending column
+  """
+  ages = []
+  for i in range(len(students[start_date_col])):
+    if not (pd.isna(students.loc[i, start_date_col]) or pd.isna(students.loc[i, end_date_col])):
+      born, current = parse_dates([students.loc[i, start_date_col], students.loc[i, end_date_col]])
+      age = int(current[2]) - int(born[2]) # NOTE: currently only using year to calculate age
+      ages.append(age)
+    else:
+      ages.append(None)
 
-# # Displaying Missing Data (updated)
-# plt.figure(figsize=(10,6)) # TODO: Uncomment to generate new graph
-# sns.set(font_scale=.45)
-# sns.displot(
-#   data=students.isna().melt(value_name="missing"),
-#   y="variable",
-#   hue="missing",
-#   multiple="fill"
-# )
-# plt.savefig("updated_null_entries.jpg")
-# plt.close()
+  students["Age"] = ages
+
+# calculate_age("_Suddenly7410", "Active Application: Date Applied") # TODO: Uncomment to use -- currently inaccurate!
+# students = students.drop("_Suddenly7410", axis=1)
+# students = students.drop("Active Application: Date Applied", axis=1)
+# date_vars.remove("_Suddenly7410")
+# date_vars.remove("Active Application: Date Applied")
+
+# Binarize 'Date Cancel'
+def build_enrolled(col):
+  """
+  Binarizes inversely the given column by adding a new column. Recommended to remove used column after use.
+  :param col: Given column name
+  """
+  enrolled = []
+  for row in range(len(students[col])):
+    if pd.isna(students.loc[row, col]):
+      enrolled.append(1) # enrolled
+    else:
+      enrolled.append(0) # cancelled
+
+  students["Enrolled"] = enrolled
+
+build_enrolled("Active Application: Date Cancel")
+students = students.drop("Active Application: Date Cancel", axis=1)
+date_vars.remove("Active Application: Date Cancel")
+
+# Manual Remove of Dates
+for col in date_vars: # NOTE: This removes all date variables. Remove if dates are needed.
+  students = students.drop(col, axis=1)
+
+# Remove Missing Rows (currently new 'GPA' column)
+students = students.dropna() # TODO: Comment to prevent data loss.
+# NOTE: This is removing about 21.6% of data.
+
+# Displaying Missing Data (updated)
+plt.figure(figsize=(10,6)) # TODO: Uncomment to generate new graph
+sns.set(font_scale=.45)
+sns.displot(
+  data=students.isna().melt(value_name="missing"),
+  y="variable",
+  hue="missing",
+  multiple="fill"
+)
+plt.savefig("updated_null_entries.jpg")
+plt.close()
 
 # Save CSV
 students.to_csv("updated_admissions_data.csv") # TODO: Uncomment to save .csv file
-
-# NOTES:
-"""
-- May drop 'To Date:' column
-- calculate age, once assured it is accurate
-- wait for Mike for a few remaining columns
-- Currently using LabelEncoder to cover null data, see if that should be changed
-- still some special case vars to check, look at updated .csv
-"""
