@@ -19,22 +19,22 @@ from sklearn.model_selection import train_test_split
 np.random.seed(1128) # consistency
 
 # Data Processing
-students = pd.read_csv("admissions_data.csv")
+students = pd.read_csv("updated_admissions_data.csv")
 print(students.head(), students.shape)
 
-removable = ["Contact Case Safe ID [TRUNCATED]", "Active Application: Case Safe ID [TRUNCATED]", # hard-coded
-             "Education ID [TRUNCATED]", "Case Safe ID_x [TRUNCATED]",
-             "Case Safe ID_y [TRUNCATED]", "Case Safe ID.1 [TRUNCATED]",
-             "Financial Aid Package ID [TRUNCATED]", "Application Case Safe Id [TRUNCATED]",
-             "Colleague_Id [TRUNCATED]", "External Package Id [TRUNCATED]"]
-for to_remove in removable: # ID removal
-  students = students.drop(to_remove, axis=1)
+# removable = ["Contact Case Safe ID [TRUNCATED]", "Active Application: Case Safe ID [TRUNCATED]", # hard-coded
+#              "Education ID [TRUNCATED]", "Case Safe ID_x [TRUNCATED]",
+#              "Case Safe ID_y [TRUNCATED]", "Case Safe ID.1 [TRUNCATED]",
+#              "Financial Aid Package ID [TRUNCATED]", "Application Case Safe Id [TRUNCATED]",
+#              "Colleague_Id [TRUNCATED]", "External Package Id [TRUNCATED]"]
+# for to_remove in removable: # ID removal
+#   students = students.drop(to_remove, axis=1)
 print(students.head(), students.shape)
 
 train, test = train_test_split(students,test_size=.20)
 
 # Separate cat/num vars
-cat_vars = []
+cat_vars = [] # should now be empty
 num_vars = []
 for column in students.columns: # NOTE: add in skipping id entries (or drop them)
   if students[column].dtype.name == "int64" or students[column].dtype.name == "float64":
@@ -46,10 +46,10 @@ for column in students.columns: # NOTE: add in skipping id entries (or drop them
 # print("NUM VARS: \n%s\nLen: %d" % (num_vars, len(num_vars)))
 
 # Data Conversion & Transformation
-from sklearn.preprocessing import LabelBinarizer # not quite what we want here
-lb = LabelBinarizer()
+# from sklearn.preprocessing import LabelBinarizer # not quite what we want here
+# lb = LabelBinarizer()
 
-students.drop("_Short8374", axis=1)
+# students.drop("_Short8374", axis=1)
 
 # Missing Data Plot
 # plt.figure(figsize=(10,6))
@@ -65,19 +65,19 @@ students.drop("_Short8374", axis=1)
 #sns.set(font_scale=1) # reset, just in case
 
 # SCATTER PLOTS #
-# for y in num_vars: # TODO: Uncomment this section to regenerate scatter plots!
-#   print(y)
-#   for x in num_vars:
-#     plt.figure(figsize=(10,10))
-#     sns.set(font_scale=.8)
-#     sns.scatterplot(
-#       x=students[x],
-#       y=students[y]
-#     )
-#     plt.savefig("scatters/%s_%s.jpg" % (str(x).replace("Active Application: ", ""), str(y).replace("Active Application: ", "")))
-#     plt.close()
+for y in num_vars: # TODO: Uncomment this section to regenerate scatter plots!
+  print(y)
+  for x in num_vars:
+    plt.figure(figsize=(10,10))
+    sns.set(font_scale=.8)
+    sns.scatterplot(
+      x=students[x],
+      y=students[y]
+    )
+    plt.savefig("scatters/%s_%s.jpg" % (str(x).replace("Active Application: ", ""), str(y).replace("Active Application: ", "")))
+    plt.close()
 
-# Correlation Matrix (numerical) # TODO: Make Categorical vars work first!
+# Correlation Matrix (numerical)
 # sns.set(font_scale=.6) # .6
 # corrMatrix = train[students.columns].corr() # num_vars
 # sns.heatmap(corrMatrix, annot=True)
